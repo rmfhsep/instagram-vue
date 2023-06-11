@@ -1,20 +1,32 @@
 <template>
   <div class="header">
     <ul class="header-button-left">
-      <li>Cancel</li>
+      <li @click="tab--">Cancel</li>
     </ul>
     <ul class="header-button-right">
-      <li>Next</li>
+      <li v-if="tab === 1 || tab === 0" @click="tab++">Next</li>
+      <li v-if="tab === 2" @click="post">Post</li>
     </ul>
     <img src="./assets/logo.png" class="logo" />
   </div>
 
-  <ContainerComp :data="datas" :tab="tab" />
+  <ContainerComp
+    :data="datas"
+    :tab="tab"
+    :imgUrl="imgUrl"
+    @write="content = $event"
+  />
   <button @click="getMoreData">More</button>
 
   <div class="footer">
     <ul class="footer-button-plus">
-      <input type="file" id="file" class="inputfile" />
+      <input
+        @change="upload"
+        accept="image/*"
+        type="file"
+        id="file"
+        class="inputfile"
+      />
       <label for="file" class="input-plus">+</label>
     </ul>
   </div>
@@ -32,6 +44,8 @@ export default {
       datas: datas,
       more: 0,
       tab: 0,
+      imgUrl: "",
+      content: "",
     };
   },
   components: {
@@ -49,6 +63,28 @@ export default {
           this.more++;
         });
     },
+    upload(e) {
+      const imgFile = e.target.files[0];
+      this.imgUrl = URL.createObjectURL(imgFile);
+      this.tab = 1;
+    },
+    post() {
+      const posts = {
+        name: "Kim Hyun",
+        userImage: "https://placeimg.com/100/100/arch",
+        postImage: this.imgUrl,
+        likes: 36,
+        date: "May 15",
+        liked: false,
+        content: this.content,
+        filter: "perpetua",
+      };
+      this.datas.unshift(posts);
+      this.tab = 0;
+    },
+  },
+  updated() {
+    console.log(this.content);
   },
 };
 </script>
